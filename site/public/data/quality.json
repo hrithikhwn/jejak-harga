@@ -59,6 +59,6 @@
     {"month":"2026-08","days":29,"last_day":"2026-08-30","price_rows":1933285,"state_rows":152212,"unknown_shop_rows":0,"unknown_item_rows":32163,"bad_price_rows":0,"duplicate_rows":0},
     {"month":"2026-09","days":28,"last_day":"2026-09-29","price_rows":1742320,"state_rows":134707,"unknown_shop_rows":0,"unknown_item_rows":26191,"bad_price_rows":0,"duplicate_rows":0},
     {"month":"2026-10","days":22,"last_day":"2026-10-31","price_rows":1359706,"state_rows":102332,"unknown_shop_rows":0,"unknown_item_rows":19798,"bad_price_rows":0,"duplicate_rows":0},
-    {"month":"2026-11","days":22,"last_day":"2026-11-22","price_rows":1267518,"state_rows":99481,"unknown_shop_rows":0,"unknown_item_rows":19664,"bad_price_rows":0,"duplicate_rows":0}
+    {"month":"2026-11","days":23,"last_day":"2026-11-23","price_rows":1480286,"state_rows":114199,"unknown_shop_rows":0,"unknown_item_rows":26325,"bad_price_rows":0,"duplicate_rows":0}
   ]
 }
