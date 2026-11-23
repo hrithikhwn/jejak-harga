@@ -126,6 +126,6 @@ def test_state_basket_has_every_month(expected_months):
     """The main chart, the state-wide basket, should have no gaps. A month needs every
     item priced by at least min_shops shops (04_basket.sql)."""
     basket = json.loads((SITE_DATA_DIR / "basket_state.json").read_text(encoding="utf-8"))
-    have = {row["month"] for row in basket}
+    have = {row["month"] for row in basket if row["basket_rm"] is not None}
     missing = [f"{month:%Y-%m}" for month in expected_months if f"{month:%Y-%m}" not in have]
     assert not missing, f"No {CONFIG['state']} basket for: " + ", ".join(missing)

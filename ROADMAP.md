@@ -21,7 +21,7 @@ The official PriceCatcher app already shows today's prices and can total a baske
 
 **Later**
 
-- All states
+- All states (planned as milestone 5)
 - A map of the cheapest districts for any item
 - A price spike detector (anomaly detection on shop prices)
 - Short-term price forecasts
@@ -75,30 +75,34 @@ jejak-harga/
 │   │   ├── 01_load.sql
 │   │   ├── 02_quality.sql
 │   │   ├── 03_monthly_prices.sql
-│   │   └── 04_basket.sql
+│   │   ├── 04_basket.sql
+│   │   └── 05_site_data.sql
 │   ├── build.py                 # runs sql/ in order, writes JSON for the site
 │   └── config.json              # state, basket item codes, min_shops, first month
 ├── data/
 │   ├── raw/                     # downloaded files (not in git)
 │   ├── monthly_prices.parquet   # monthly summary, updated by the daily job
 │   └── monthly_quality.parquet  # data-quality counts per month
-├── site/                        # React app (Vite)
+├── site/                        # React app (Vite), see WEB_UI.md
 │   ├── public/data/             # JSON written by build.py
-│   └── src/
+│   └── src/                     # components/, i18n/ (ms.json, en.json), content/ (events, findings)
 ├── tests/
 │   └── test_data.py             # fails the build if the new data looks broken
-├── .github/workflows/refresh.yml
-├── .gitignore                   # raw downloads and *.duckdb stay out of git
+├── .github/workflows/
+│   ├── deploy.yml               # tests, builds and publishes the site on each push
+│   └── refresh.yml              # daily refresh (milestone 4)
+├── .gitignore                   # raw downloads, *.duckdb and node_modules stay out of git
 ├── requirements.txt
 ├── README.md
-└── ROADMAP.md
+├── ROADMAP.md
+└── WEB_UI.md                    # how the site looks and behaves
 ```
 
 ## How the pipeline works
 
 1. A scheduled GitHub Actions workflow runs once a day, after PriceCatcher's daily update.
 2. `pipeline/build.py` downloads only the previous and current month's files (late prices can arrive) and replaces those months. Past months are already summarised in `data/monthly_prices.parquet`.
-3. DuckDB runs the SQL in `pipeline/sql/` in order: load, quality checks, state and district monthly prices, basket cost.
+3. DuckDB runs the SQL in `pipeline/sql/` in order: load, quality checks, state and district monthly prices, basket cost, item prices for the site.
 4. `build.py` writes small JSON files and a last-updated date to `site/public/data/`.
 5. Vite builds the React site and the workflow deploys it to GitHub Pages.
 
@@ -136,10 +140,10 @@ Done when one command rebuilds everything from scratch.
 
 ### 3. Site
 
-- [ ] Set up a Vite + React app
-- [ ] Main line chart (e.g. Recharts): the Selangor-wide basket over time, with district lines you can add
-- [ ] Let people switch basket items on and off
-- [ ] Show the food CPI line for context
+- [x] Set up a Vite + React app
+- [x] Main line chart (e.g. Recharts): the Selangor-wide basket over time, with district lines you can add
+- [x] Let people switch basket items on and off
+- [x] Show the food CPI line for context
 - [ ] Deploy to GitHub Pages
 
 Done when the live link works on a phone.
@@ -150,6 +154,26 @@ Done when the live link works on a phone.
 - [ ] Write the README: live link, GIF, three key findings, limitations and data credits
 
 Done when the last-updated date changes with no manual work.
+
+### 5. All states
+
+Coverage check (November 2026), with the current basket and the same rule as the districts: all 15 items, each priced by at least 3 shops.
+
+| States | Months with a full basket (of 59) |
+|---|---|
+| Johor, Kedah, Kelantan, Negeri Sembilan, Pahang, Perak, Pulau Pinang, Selangor, Terengganu, W.P. Kuala Lumpur | 59 |
+| Perlis, Melaka, W.P. Putrajaya | 46, 41, 31 |
+| Sabah, Sarawak, W.P. Labuan | 0 |
+
+In October 2026 the full baskets ranged from RM142.14 (Kedah) to RM152.90 (Kuala Lumpur), with Selangor at RM147.29. Sabah, Sarawak and Labuan never qualify because the basket's rice (904, Super Cap Rambutan) isn't sold there, and Labuan is also short of shops for other items.
+
+- [ ] Decide on East Malaysia: pick a rice sold in every state (this changes every Selangor figure), or keep the basket and label Sabah, Sarawak and Labuan "not comparable". Swapping items state by state would break the like-for-like comparison.
+- [ ] Run the pipeline for every state (the monthly files already include them all)
+- [ ] Use `{state}` in every piece of site text that now says Selangor
+- [ ] Add a state picker, only once it works (no placeholder before then)
+- [ ] Compare states as a list ranked from cheapest to dearest, with an optional tile map (one equal-sized square per state, so Putrajaya, Labuan and Perlis stay visible)
+
+Done when every state with enough shops has its own basket, and the comparison shows them all.
 
 ## Limitations (for the README)
 

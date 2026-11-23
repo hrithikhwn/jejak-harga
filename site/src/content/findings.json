@@ -1,0 +1,32 @@
+[
+  {
+    "item_code": 904,
+    "title": {
+      "ms": "Beras import: {change:2023-04:2024-04} dalam setahun",
+      "en": "Imported rice: {change:2023-04:2024-04} in a year"
+    },
+    "text": {
+      "ms": "Sekampit 10kg Beras Super Cap Rambutan berharga {price:2023-04} pada Apr 2023 dan {price:2024-04} pada Apr 2024. Bernas menaikkan harga beras putih import sebanyak 36% pada 1 September 2023.",
+      "en": "A 10kg bag of Super Cap Rambutan rice cost {price:2023-04} in Apr 2023 and {price:2024-04} in Apr 2024. Bernas raised the price of imported white rice by 36% on 1 September 2023."
+    },
+    "source": {
+      "name": "The Star",
+      "url": "https://www.thestar.com.my/news/nation/2023/09/01/price-of-imported-white-rice-up-by-36-says-bernas"
+    }
+  },
+  {
+    "item_code": 1601,
+    "title": {
+      "ms": "Minyak masak botol melonjak apabila subsidinya tamat",
+      "en": "Bottled cooking oil jumped when its subsidy ended"
+    },
+    "text": {
+      "ms": "Sebotol 2kg minyak masak Cap Buruh berharga {price:2022-06} pada Jun 2022. Subsidi minyak masak botol tamat pada 1 Julai 2022, dan harganya menjadi {price:2022-07} pada Jul 2022 sebelum turun kepada {price:2022-10} pada Okt 2022.",
+      "en": "A 2kg bottle of Cap Buruh cooking oil cost {price:2022-06} in Jun 2022. The subsidy for bottled cooking oil ended on 1 July 2022, and the price was {price:2022-07} in Jul 2022 before easing to {price:2022-10} by Oct 2022."
+    },
+    "source": {
+      "name": "Malay Mail",
+      "url": "https://www.malaymail.com/news/malaysia/2022/06/22/pm-govt-to-continue-subsidy-for-cooking-oil-in-plastic-packets-only-bottled-stopped/13653"
+    }
+  }
+]

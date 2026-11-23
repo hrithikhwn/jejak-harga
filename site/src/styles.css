@@ -1,0 +1,750 @@
+/* Colours and type from WEB_UI.md. Every text colour here was checked for at least
+   4.5:1 contrast against the background it sits on. Phone layout first; wider
+   screens add columns. */
+:root {
+  color-scheme: light;
+  --ink: #16181d;
+  --ink-2: #4a505c; /* secondary text */
+  --ink-3: #5f6673; /* quieter text: notes, axis labels */
+  --line: #e3e5ea; /* hairline borders and gridlines */
+  --control: #7b8190; /* outlines of buttons and checkboxes */
+  --bg: #ffffff;
+  --bg-2: #f6f6f9; /* table headers, quiet panels */
+  --hero: #2b0b57;
+  --hero-text: #d9ccf2;
+  --sun: #ffd23f;
+  --accent: #d6125f;
+  --link: #7a1fa2;
+  --finding: #ffe27a;
+  --up: #b8430b; /* dearer */
+  --down: #1d4ed8; /* cheaper */
+  --radius: 12px;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+}
+
+h2 {
+  font-size: 1.6rem;
+}
+
+h3 {
+  font-size: 1.15rem;
+}
+
+p {
+  margin: 0 0 0.75rem;
+}
+
+a {
+  color: var(--link);
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.section {
+  padding: 48px 0 8px;
+  scroll-margin-top: 16px;
+}
+
+.section-intro {
+  color: var(--ink-2);
+  max-width: 70ch;
+}
+
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -60px;
+  z-index: 10;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
+.status-page {
+  display: grid;
+  place-items: center;
+  min-height: 60vh;
+  padding: 16px;
+  color: var(--ink-2);
+}
+
+/* ---------- Header: logo and language on one row, then the links ---------- */
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 24px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.logo {
+  margin-right: auto;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.lang-switch {
+  order: 1;
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.lang-switch button {
+  min-width: 52px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.lang-switch button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+
+.site-nav {
+  order: 2;
+  width: 100%;
+}
+
+.site-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+.updated {
+  order: 3;
+  width: 100%;
+  margin: 0 0 4px;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+@media (min-width: 900px) {
+  .site-nav {
+    order: 1;
+    width: auto;
+  }
+
+  .updated {
+    order: 2;
+    width: auto;
+    margin: 0;
+  }
+
+  .lang-switch {
+    order: 3;
+  }
+}
+
+/* ---------- Hero: deep purple panel, yellow headline, white cards ---------- */
+
+.hero {
+  padding: 40px 0 48px;
+  background: var(--hero);
+  color: #fff;
+}
+
+.hero-title {
+  margin-bottom: 8px;
+  color: var(--sun);
+  font-size: clamp(2.75rem, 10vw, 4.75rem);
+}
+
+.hero-subtitle {
+  max-width: 42ch;
+  margin-bottom: 24px;
+  color: var(--hero-text);
+  font-size: 1.125rem;
+}
+
+.hero-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 760px) {
+  .hero-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--ink);
+}
+
+.stat-label {
+  margin-bottom: 4px;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.stat-value {
+  margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.hero-figure {
+  font-size: 3.25rem; /* the one big number on the page */
+}
+
+.stat-item {
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.stat-note {
+  margin-bottom: 4px;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+.unit {
+  color: var(--ink-3);
+  font-size: 0.875em;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.delta {
+  font-weight: 600;
+}
+
+.delta.up {
+  color: var(--up);
+}
+
+.delta.down {
+  color: var(--down);
+}
+
+/* ---------- Main chart ---------- */
+
+.chart-controls {
+  margin: 16px 0 4px;
+}
+
+.control-label {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--control);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--ink);
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--bg-2);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.chip:disabled {
+  border-color: var(--line);
+  background: var(--bg-2);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+
+.hint {
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+
+.chart-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.line-key {
+  flex: none;
+}
+
+.chart {
+  height: 320px;
+  margin: 0 0 8px;
+}
+
+@media (min-width: 760px) {
+  .chart {
+    height: 400px;
+  }
+}
+
+.end-label {
+  fill: var(--ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.event-number {
+  fill: #fff;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chart-tooltip {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(22, 24, 29, 0.12);
+  font-size: 0.875rem;
+}
+
+.tooltip-month {
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.chart-tooltip ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chart-tooltip li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-tooltip li span {
+  color: var(--ink-3);
+}
+
+.chart-note {
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+
+.events-title {
+  margin-top: 16px;
+  font-size: 1rem;
+}
+
+.event-list {
+  margin: 0 0 12px;
+  padding-left: 1.5rem;
+  color: var(--ink-2);
+}
+
+.event-list li {
+  margin-bottom: 4px;
+}
+
+.event-date {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.table-view summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--link);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ---------- Tabs: Bakul, Daerah, Kaedah ---------- */
+
+/* The bar sticks to the top of the screen while its tab is read. It stays inside
+   .tabs, so it stops sticking once the tabs end and the footer starts. */
+.tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin-top: 40px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.tab-list {
+  display: flex;
+  gap: 4px;
+}
+
+.tab-list [role="tab"] {
+  flex: 1 1 0; /* three equal tabs on a phone */
+  min-height: 52px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab-list [role="tab"]:hover {
+  color: var(--ink);
+}
+
+.tab-list [role="tab"][aria-selected="true"] {
+  border-bottom-color: var(--accent);
+  color: var(--ink);
+}
+
+@media (min-width: 760px) {
+  .tab-list [role="tab"] {
+    flex: 0 0 auto;
+    padding: 0 24px;
+  }
+}
+
+/* Less space above the first section of a tab: the tab bar already separates it */
+.tab-panel > .section:first-child {
+  padding-top: 24px;
+}
+
+.tab-panel:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ---------- Tables: they scroll sideways in their own box on phones ---------- */
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+th,
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+thead th {
+  background: var(--bg-2);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody th {
+  font-weight: 600;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The first column stays in view while the rest scrolls */
+.sticky {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #fff;
+}
+
+thead .sticky,
+tfoot .sticky {
+  background: var(--bg-2);
+}
+
+.basket-table th.sticky {
+  min-width: 170px;
+  max-width: 240px;
+}
+
+tfoot th,
+tfoot td {
+  border-bottom: 0;
+  background: var(--bg-2);
+  font-weight: 700;
+}
+
+tr.off th,
+tr.off td,
+tr.off .delta {
+  color: var(--ink-3);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px 0 8px;
+  border: 1px solid var(--control);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.toggle-box {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--control);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.toggle[aria-pressed="true"] .toggle-box {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+/* ---------- Findings: yellow panels ---------- */
+
+.finding-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 760px) {
+  .finding-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.finding {
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  background: var(--finding);
+}
+
+.finding h3 {
+  font-size: 1.25rem;
+}
+
+.finding-source {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+
+/* ---------- District cards ---------- */
+
+.district-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.district h3 {
+  margin-bottom: 4px;
+  font-size: 1.1rem;
+}
+
+.district-cost {
+  margin-bottom: 2px;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+
+.district.not-shown {
+  background: var(--bg-2);
+}
+
+.district-status {
+  margin-bottom: 4px;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.missing-list {
+  margin: 0 0 8px;
+  padding-left: 1.1rem;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+
+/* ---------- Method and footer ---------- */
+
+.method h3 {
+  margin-top: 24px;
+}
+
+/* Comfortable reading width, but the same left edge as the other sections */
+.method p,
+.method ol,
+.method ul {
+  max-width: 72ch;
+}
+
+.method ol,
+.method ul {
+  padding-left: 1.4rem;
+  color: var(--ink-2);
+}
+
+.method li {
+  margin-bottom: 6px;
+}
+
+.site-footer {
+  margin-top: 56px;
+  padding: 32px 0 40px;
+  border-top: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}

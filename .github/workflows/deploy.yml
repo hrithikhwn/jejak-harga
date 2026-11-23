@@ -1,0 +1,57 @@
+# Builds the site from the data in the repo and publishes it on GitHub Pages.
+# Runs on every push to main, or by hand from the Actions tab.
+# One-time setup: Settings > Pages > Build and deployment > Source: "GitHub Actions".
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write # publish to GitHub Pages
+  id-token: write # lets Pages check the upload really comes from this workflow
+
+concurrency:
+  group: pages
+  cancel-in-progress: false # let a deploy that has started finish
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The data checks (tests/test_data.py) on the committed data
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: pip install -r requirements.txt
+      - run: pytest
+
+      # The site: npm ci installs exactly what package-lock.json lists, then
+      # npm run build runs the site tests and builds into site/dist/
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - run: npm run build
+        working-directory: site
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

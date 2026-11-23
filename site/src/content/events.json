@@ -1,0 +1,35 @@
+[
+  {
+    "date": "2022-07-01",
+    "label": {
+      "ms": "Subsidi minyak masak botol tamat",
+      "en": "Subsidy for bottled cooking oil ends"
+    },
+    "source": {
+      "name": "Malay Mail",
+      "url": "https://www.malaymail.com/news/malaysia/2022/06/22/pm-govt-to-continue-subsidy-for-cooking-oil-in-plastic-packets-only-bottled-stopped/13653"
+    }
+  },
+  {
+    "date": "2023-09-01",
+    "label": {
+      "ms": "Bernas menaikkan harga beras putih import sebanyak 36%",
+      "en": "Bernas raises the price of imported white rice by 36%"
+    },
+    "source": {
+      "name": "The Star",
+      "url": "https://www.thestar.com.my/news/nation/2023/09/01/price-of-imported-white-rice-up-by-36-says-bernas"
+    }
+  },
+  {
+    "date": "2025-08-01",
+    "label": {
+      "ms": "Subsidi telur tamat sepenuhnya",
+      "en": "Egg subsidy ends completely"
+    },
+    "source": {
+      "name": "The Star",
+      "url": "https://www.thestar.com.my/news/nation/2025/04/30/egg-subsidy-rate-reduced-from-rm010-to-rm005-per-egg-effective-may-1"
+    }
+  }
+]

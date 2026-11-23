@@ -8,7 +8,8 @@ Steps:
 1. Download the monthly PriceCatcher files it needs, the two lookups and the state CPI
    into data/raw/ (kept out of git).
 2. In an in-memory DuckDB database, run pipeline/sql/01-03 for each month (load,
-   quality counts, monthly prices), then 04 once over all months (basket cost).
+   quality counts, monthly prices), then 04 (basket cost) and 05 (item prices
+   shaped for the site) once over all months.
 3. Save the monthly summaries to data/monthly_prices.parquet and
    data/monthly_quality.parquet. The daily run starts from these.
 4. Write small JSON files for the site to site/public/data/.
@@ -44,7 +45,17 @@ INPUT_URLS = {  # SQL variable name -> file to download
     "premises_file": f"{PRICECATCHER_URL}/lookup_premise.parquet",
     "cpi_file": "https://storage.dosm.gov.my/cpi/cpi_2d_state.parquet",
 }
-MONTHLY_SQL = ["01_load.sql", "02_quality.sql", "03_monthly_prices.sql"]
+MONTHLY_SQL = ["01_load.sql", "02_quality.sql", "03_monthly_prices.sql"]  # once per month
+FINAL_SQL = ["04_basket.sql", "05_site_data.sql"]                          # once, over all months
+
+# Credited on the site: the data is CC BY 4.0, which asks for attribution
+SOURCES = [
+    {"data": "PriceCatcher", "publisher": "KPDN", "via": "OpenDOSM",
+     "url": "https://open.dosm.gov.my/data-catalogue/pricecatcher"},
+    {"data": "Consumer Price Index by state", "publisher": "DOSM", "via": "OpenDOSM",
+     "url": "https://open.dosm.gov.my/data-catalogue/cpi_state"},
+]
+LICENCE = {"name": "CC BY 4.0", "url": "https://creativecommons.org/licenses/by/4.0/"}
 
 # GitHub Actions runs in UTC. Malaysia has no daylight saving, so a fixed
 # UTC+8 offset always gives the Malaysian date.
@@ -155,7 +166,7 @@ def load_saved_summaries(con: duckdb.DuckDBPyConnection, config: dict) -> date:
 
 
 def build_tables(con: duckdb.DuckDBPyConnection, config: dict, inputs: dict, price_files: dict) -> None:
-    """Run 01-03 for each month, then 04 over every month."""
+    """Run 01-03 for each month, then 04 and 05 over every month."""
     set_variables(con,
                   state=config["state"],
                   basket=config["basket"],
@@ -170,7 +181,8 @@ def build_tables(con: duckdb.DuckDBPyConnection, config: dict, inputs: dict, pri
             "SELECT days, price_rows, state_rows FROM monthly_quality WHERE month = ?", [month]
         ).fetchone()
         print(f"{month:%Y-%m}  {rows:>9,} prices on {days:>2} days, {state_rows:>7,} in {config['state']}")
-    run_sql(con, "04_basket.sql")
+    for file_name in FINAL_SQL:
+        run_sql(con, file_name)
 
 
 def save_parquet(con: duckdb.DuckDBPyConnection, query: str, path: Path) -> None:
@@ -183,11 +195,13 @@ def save_parquet(con: duckdb.DuckDBPyConnection, query: str, path: Path) -> None
 # ---------------------------------------------------------------- JSON for the site
 
 def to_json_value(value):
-    """DuckDB gives exact decimals and dates; JSON wants plain numbers and text."""
+    """DuckDB gives exact decimals, dates and lists of them; JSON wants plain numbers and text."""
     if isinstance(value, Decimal):
         return float(value)
     if isinstance(value, date):
         return value.isoformat()
+    if isinstance(value, list):
+        return [to_json_value(v) for v in value]
     return value
 
 
@@ -198,41 +212,83 @@ def records(con: duckdb.DuckDBPyConnection, query: str) -> list[dict]:
     return [{c: to_json_value(v) for c, v in zip(columns, row)} for row in cursor.fetchall()]
 
 
+def json_text(value, depth: int = 0) -> str:
+    """JSON with one entry per line, but a list or object that holds only plain values
+    (or sits 3 levels deep) stays on one line. Small files, readable git diffs."""
+    if not isinstance(value, (dict, list)):
+        return json.dumps(value, ensure_ascii=False)
+    children = list(value.values()) if isinstance(value, dict) else value
+    if depth >= 3 or not any(isinstance(child, (dict, list)) for child in children):
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    pad, end = "  " * (depth + 1), "  " * depth
+    if isinstance(value, dict):
+        lines = [f"{pad}{json.dumps(key)}: {json_text(child, depth + 1)}" for key, child in value.items()]
+        return "{\n" + ",\n".join(lines) + f"\n{end}}}"
+    lines = [pad + json_text(child, depth + 1) for child in value]
+    return "[\n" + ",\n".join(lines) + f"\n{end}]"
+
+
 def write_json(path: Path, data) -> None:
-    """Write data as JSON. A list gets one record per line, which keeps git diffs readable."""
-    if isinstance(data, list):
-        text = "[\n" + ",\n".join(json.dumps(row, ensure_ascii=False) for row in data) + "\n]\n"
-    else:
-        text = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
-    path.write_text(text, encoding="utf-8")
+    path.write_text(json_text(data) + "\n", encoding="utf-8")
 
 
-def site_data(con: duckdb.DuckDBPyConnection, config: dict) -> dict:
-    """Every file the site loads, as {file name: data}."""
+def site_data(con: duckdb.DuckDBPyConnection, config: dict, this_month: date) -> dict:
+    """Every file the site loads, as {file name: data}. The layout follows WEB_UI.md."""
+    months = [m for (m,) in con.execute(
+        "SELECT DISTINCT strftime(month, '%Y-%m') AS m FROM monthly_prices ORDER BY m").fetchall()]
     data_until = con.execute("SELECT max(last_day) FROM monthly_quality").fetchone()[0]
+    # The current calendar month is still collecting prices, so the site labels it partial
+    partial_month = months[-1] if months[-1] == f"{this_month:%Y-%m}" else None
+
+    # Each basket item's state-wide prices, with its name and unit from the item lookup
+    items = records(con, """
+        SELECT p.item_code, i.item, i.unit, i.item_group, i.item_category, p.price, p.shops
+        FROM site_item_prices p
+        LEFT JOIN items i ON i.item_code = p.item_code
+        WHERE p.level = 'state'
+        ORDER BY list_position(getvariable('basket'), p.item_code)
+    """)
+    # The same per district, nested as {district: {item code: {price: [...], shops: [...]}}}
+    districts = {}
+    for row in records(con, """
+        SELECT area, item_code, price, shops
+        FROM site_item_prices
+        WHERE level = 'district'
+        ORDER BY area, list_position(getvariable('basket'), item_code)
+    """):
+        districts.setdefault(row["area"], {})[str(row["item_code"])] = {
+            "price": row["price"], "shops": row["shops"]}
+
     return {
-        # The main series: the state-wide basket each month
+        "meta.json": {
+            "last_updated": datetime.now(MALAYSIA).date().isoformat(),
+            "data_until": data_until.isoformat(),  # the latest day with prices
+            "latest_full_month": months[-2] if partial_month else months[-1],
+            "partial_month": partial_month,        # null once the month is over
+            "state": config["state"],
+            "min_shops": config["min_shops"],
+            "first_month": months[0],
+            "sources": SOURCES,
+            "licence": LICENCE,
+        },
+        # The main series: the state-wide basket each month (null if an item lacked shops)
         "basket_state.json": records(con, """
             SELECT strftime(month, '%Y-%m') AS month, basket_rm, fewest_shops
             FROM basket
             WHERE level = 'state'
             ORDER BY month
         """),
-        # District lines: only months where every item had at least min_shops shops there
+        # District lines: null in months where an item had fewer than min_shops shops there
         "basket_districts.json": records(con, """
             SELECT strftime(month, '%Y-%m') AS month, area AS district, basket_rm, fewest_shops
             FROM basket
             WHERE level = 'district'
             ORDER BY district, month
         """),
-        # Each basket item's state-wide price, so the site can switch items on and off
-        "item_prices.json": records(con, """
-            SELECT strftime(month, '%Y-%m') AS month, item_code, price, shops
-            FROM monthly_prices
-            WHERE level = 'state'
-            ORDER BY item_code, month
-        """),
-        "food_cpi.json": records(con, """
+        # Item prices line up with "months": price[i] and shops[i] belong to months[i]
+        "items.json": {"months": months, "items": items},
+        "item_districts.json": {"months": months, "districts": districts},
+        "cpi.json": records(con, """
             SELECT strftime(month, '%Y-%m') AS month, food_cpi
             FROM food_cpi
             ORDER BY month
@@ -243,20 +299,6 @@ def site_data(con: duckdb.DuckDBPyConnection, config: dict) -> dict:
                 SELECT strftime(month, '%Y-%m') AS month, * EXCLUDE (month)
                 FROM monthly_quality
                 ORDER BY month
-            """),
-        },
-        "meta.json": {
-            "last_updated": datetime.now(MALAYSIA).date().isoformat(),
-            "data_until": data_until.isoformat(),  # the latest day with prices
-            "state": config["state"],
-            "min_shops": config["min_shops"],
-            "first_month": f"{config['first_month']:%Y-%m}",
-            # Names and units from the item lookup, in config.json order
-            "basket": records(con, """
-                SELECT item_code, item, unit, item_group, item_category
-                FROM items
-                WHERE list_contains(getvariable('basket'), item_code)
-                ORDER BY list_position(getvariable('basket'), item_code)
             """),
         },
     }
@@ -293,16 +335,16 @@ def main() -> None:
     save_parquet(con, "SELECT * FROM monthly_quality ORDER BY month", QUALITY_FILE)
 
     SITE_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    outputs = site_data(con, config)
+    outputs = site_data(con, config, this_month)
     for file_name, data in outputs.items():
         write_json(SITE_DATA_DIR / file_name, data)
 
     print(f"Saved data/{PRICES_FILE.name} and data/{QUALITY_FILE.name}; "
           f"wrote {len(outputs)} files to site/public/data/")
     print(f"Prices until {outputs['meta.json']['data_until']}. Took {time.monotonic() - started:.0f}s.")
-    if outputs["basket_state.json"]:
-        latest = outputs["basket_state.json"][-1]
-        print(f"Latest {config['state']} basket: RM{latest['basket_rm']:.2f} ({latest['month']})")
+    priced = [row for row in outputs["basket_state.json"] if row["basket_rm"] is not None]
+    if priced:
+        print(f"Latest {config['state']} basket: RM{priced[-1]['basket_rm']:.2f} ({priced[-1]['month']})")
 
 
 if __name__ == "__main__":
