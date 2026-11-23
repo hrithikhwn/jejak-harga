@@ -1,0 +1,114 @@
+{
+  "last_updated": "2026-11-23",
+  "data_until": "2026-11-22",
+  "state": "Selangor",
+  "min_shops": 3,
+  "first_month": "2022-01",
+  "basket": [
+    {
+      "item_code": 1,
+      "item": "AYAM BERSIH - STANDARD",
+      "unit": "1kg",
+      "item_group": "BARANGAN SEGAR",
+      "item_category": "AYAM"
+    },
+    {
+      "item_code": 1111,
+      "item": "TELUR AYAM GRED C",
+      "unit": "30 biji",
+      "item_group": "BARANGAN SEGAR",
+      "item_category": "TELUR"
+    },
+    {
+      "item_code": 904,
+      "item": "BERAS SUPER CAP RAMBUTAN 5% (IMPORT)",
+      "unit": "10 kg",
+      "item_group": "BARANGAN BERBUNGKUS",
+      "item_category": "BERAS"
+    },
+    {
+      "item_code": 1601,
+      "item": "MINYAK MASAK TULEN CAP BURUH",
+      "unit": "2 kg",
+      "item_group": "BARANGAN BERBUNGKUS",
+      "item_category": "MINYAK DAN LEMAK"
+    },
+    {
+      "item_code": 1589,
+      "item": "GULA PUTIH BERTAPIS KASAR (PELBAGAI JENAMA)",
+      "unit": "1kg",
+      "item_group": "BARANGAN BERBUNGKUS",
+      "item_category": "GULA"
+    },
+    {
+      "item_code": 917,
+      "item": "TEPUNG GANDUM NGP (BERBUNGKUS, CAP SAUH)",
+      "unit": "1kg",
+      "item_group": "BARANGAN BERBUNGKUS",
+      "item_category": "TEPUNG"
+    },
+    {
+      "item_code": 70,
+      "item": "IKAN SELAR/PELATA (≤ 7 EKOR SEKILOGRAM)",
+      "unit": "1kg",
+      "item_group": "BARANGAN SEGAR",
+      "item_category": "BAHAN LAUT"
+    },
+    {
+      "item_code": 129,
+      "item": "BAWANG BESAR KUNING/HOLLAND",
+      "unit": "1kg",
+      "item_group": "BARANGAN KERING",
+      "item_category": "BAWANG"
+    },
+    {
+      "item_code": 1564,
+      "item": "BAWANG PUTIH IMPORT (CHINA)",
+      "unit": "1kg",
+      "item_group": "BARANGAN KERING",
+      "item_category": "BAWANG"
+    },
+    {
+      "item_code": 94,
+      "item": "CILI MERAH - MINYAK",
+      "unit": "1kg",
+      "item_group": "BARANGAN SEGAR",
+      "item_category": "SAYUR-SAYURAN"
+    },
+    {
+      "item_code": 114,
+      "item": "TOMATO",
+      "unit": "1kg",
+      "item_group": "BARANGAN SEGAR",
+      "item_category": "SAYUR-SAYURAN"
+    },
+    {
+      "item_code": 1131,
+      "item": "UBI KENTANG IMPORT (CHINA)",
+      "unit": "1kg",
+      "item_group": "BARANGAN KERING",
+      "item_category": "UBI KENTANG"
+    },
+    {
+      "item_code": 1611,
+      "item": "SANTAN KELAPA JENAMA KARA",
+      "unit": "200 ml",
+      "item_group": "BARANGAN BERBUNGKUS",
+      "item_category": "SANTAN (KOTAK)"
+    },
+    {
+      "item_code": 1976,
+      "item": "MAGGI MI SEGERA PERISA KARI",
+      "unit": "5 X 79g",
+      "item_group": "BARANGAN BERBUNGKUS",
+      "item_category": "MI SEGERA"
+    },
+    {
+      "item_code": 883,
+      "item": "KRIMER MANIS BERVITAMIN CAP F&N",
+      "unit": "500 g",
+      "item_group": "BARANGAN BERBUNGKUS",
+      "item_category": "KRIMER DAN SUSU TEPUNG"
+    }
+  ]
+}

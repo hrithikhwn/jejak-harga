@@ -77,15 +77,19 @@ jejak-harga/
 │   │   ├── 03_monthly_prices.sql
 │   │   └── 04_basket.sql
 │   ├── build.py                 # runs sql/ in order, writes JSON for the site
-│   └── config.json              # state, basket item codes, min_shops
+│   └── config.json              # state, basket item codes, min_shops, first month
 ├── data/
-│   └── monthly_prices.parquet   # monthly summary, updated by the daily job
+│   ├── raw/                     # downloaded files (not in git)
+│   ├── monthly_prices.parquet   # monthly summary, updated by the daily job
+│   └── monthly_quality.parquet  # data-quality counts per month
 ├── site/                        # React app (Vite)
 │   ├── public/data/             # JSON written by build.py
 │   └── src/
 ├── tests/
+│   └── test_data.py             # fails the build if the new data looks broken
 ├── .github/workflows/refresh.yml
 ├── .gitignore                   # raw downloads and *.duckdb stay out of git
+├── requirements.txt
 ├── README.md
 └── ROADMAP.md
 ```
@@ -93,7 +97,7 @@ jejak-harga/
 ## How the pipeline works
 
 1. A scheduled GitHub Actions workflow runs once a day, after PriceCatcher's daily update.
-2. `pipeline/build.py` downloads only the current month's file. Past months are already summarised in `data/monthly_prices.parquet`.
+2. `pipeline/build.py` downloads only the previous and current month's files (late prices can arrive) and replaces those months. Past months are already summarised in `data/monthly_prices.parquet`.
 3. DuckDB runs the SQL in `pipeline/sql/` in order: load, quality checks, state and district monthly prices, basket cost.
 4. `build.py` writes small JSON files and a last-updated date to `site/public/data/`.
 5. Vite builds the React site and the workflow deploys it to GitHub Pages.
@@ -104,8 +108,8 @@ jejak-harga/
 
 - Each shop gets one price per item per month (its median), so shops that report every day don't outweigh shops that report weekly.
 - The Selangor price for an item is the median across all reporting shops in the state. A district's price is the median across the shops in that district.
-- Basket cost is the sum of the item prices, one unit of each.
-- The Selangor-wide basket is the main series. A district only gets a value for a month if every basket item has at least 3 shops there that month (`min_shops` in `config.json`).
+- Basket cost is the sum of the item prices, one unit of each. Item prices are kept as exact decimals and the total is rounded to the sen at the end, with half a sen rounding up, so every run gives the same answer.
+- The Selangor-wide basket is the main series. A district only gets a value for a month if every basket item has at least 3 shops there that month (`min_shops` in `config.json`). The same rule applies state-wide, where it only matters in the first days of a new month.
 - Rows with unknown shops or items, and zero or missing prices, are dropped. The pipeline counts them so they can be reported.
 
 ## Milestones
@@ -122,11 +126,11 @@ Done when the basket list and notes exist.
 
 ### 2. Pipeline
 
-- [ ] Split `explore.sql` into the files in `pipeline/sql/`
-- [ ] Compute the Selangor-wide basket and the district baskets (with `min_shops`)
-- [ ] Make `build.py` write the JSON and a last-updated date
-- [ ] Add a `--full` mode that rebuilds history from all monthly files
-- [ ] Add tests that fail if quality numbers jump or row counts drop
+- [x] Split `explore.sql` into the files in `pipeline/sql/`
+- [x] Compute the Selangor-wide basket and the district baskets (with `min_shops`)
+- [x] Make `build.py` write the JSON and a last-updated date
+- [x] Add a `--full` mode that rebuilds history from all monthly files
+- [x] Add tests that fail if quality numbers jump or row counts drop
 
 Done when one command rebuilds everything from scratch.
 
