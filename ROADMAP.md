@@ -144,7 +144,7 @@ Done when one command rebuilds everything from scratch.
 - [x] Main line chart (e.g. Recharts): the Selangor-wide basket over time, with district lines you can add
 - [x] Let people switch basket items on and off
 - [x] Show the food CPI line for context
-- [ ] Deploy to GitHub Pages
+- [x] Deploy to GitHub Pages
 
 Done when the live link works on a phone.
 

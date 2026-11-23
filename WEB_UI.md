@@ -131,8 +131,8 @@ The site works out the heat map and map colours from these files, so no extra fi
 - [x] Main chart (Recharts) with district and CPI toggles and event markers
 - [x] Basket table with on/off buttons that update the hero total and chart
 - [x] District cards and the Method and Limitations section
-- [ ] Phone layout checked on a real phone
-- [ ] Deployed to GitHub Pages
+- [x] Phone layout checked on a real phone
+- [x] Deployed to GitHub Pages
 
 ### v2
 
