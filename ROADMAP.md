@@ -88,9 +88,11 @@ jejak-harga/
 │   └── src/                     # components/, i18n/ (ms.json, en.json), content/ (events, findings)
 ├── tests/
 │   └── test_data.py             # fails the build if the new data looks broken
+├── docs/
+│   └── demo.gif                 # the GIF in the README
 ├── .github/workflows/
 │   ├── deploy.yml               # tests, builds and publishes the site on each push
-│   └── refresh.yml              # daily refresh (milestone 4)
+│   └── refresh.yml              # daily: new data, checks, commit, then starts deploy.yml
 ├── .gitignore                   # raw downloads, *.duckdb and node_modules stay out of git
 ├── requirements.txt
 ├── README.md
@@ -100,11 +102,11 @@ jejak-harga/
 
 ## How the pipeline works
 
-1. A scheduled GitHub Actions workflow runs once a day, after PriceCatcher's daily update.
+1. A scheduled GitHub Actions workflow (`refresh.yml`) runs once a day at 9:17pm Malaysia time, about an hour after PriceCatcher's daily update.
 2. `pipeline/build.py` downloads only the previous and current month's files (late prices can arrive) and replaces those months. Past months are already summarised in `data/monthly_prices.parquet`.
 3. DuckDB runs the SQL in `pipeline/sql/` in order: load, quality checks, state and district monthly prices, basket cost, item prices for the site.
 4. `build.py` writes small JSON files and a last-updated date to `site/public/data/`.
-5. Vite builds the React site and the workflow deploys it to GitHub Pages.
+5. The workflow runs the data checks, commits the new data and starts `deploy.yml`, which runs the site tests, builds the site with Vite and publishes it on GitHub Pages. If a check fails, nothing is committed or published.
 
 `python pipeline/build.py --full` rebuilds the summary from every monthly file.
 
@@ -150,8 +152,8 @@ Done when the live link works on a phone.
 
 ### 4. Automate and polish
 
-- [ ] Add `.github/workflows/refresh.yml` on a daily schedule
-- [ ] Write the README: live link, GIF, three key findings, limitations and data credits
+- [x] Add `.github/workflows/refresh.yml` on a daily schedule
+- [x] Write the README: live link, GIF, three key findings, limitations and data credits
 
 Done when the last-updated date changes with no manual work.
 
@@ -186,6 +188,7 @@ Done when every state with enough shops has its own basket, and the comparison s
 
 ## Gotchas
 
-- GitHub Actions cron runs in UTC. PriceCatcher's catalogue page lists its daily update at 12:00, so schedule the job an hour later: `0 5 * * *` is 1pm in Malaysia.
+- GitHub Actions cron runs in UTC. PriceCatcher's files change at about 12:00 UTC, which is 8pm in Malaysia (a file's `Last-Modified` header shows it), so `refresh.yml` runs at `17 13 * * *`: 9:17pm in Malaysia, with an hour's margin, and away from the top of the hour, when GitHub delays scheduled runs most.
+- A push made with a workflow's own token doesn't start other workflows (GitHub's guard against loops), so `refresh.yml` starts `deploy.yml` itself with `gh workflow run`.
 - GitHub pauses scheduled workflows in public repos after 60 days without activity. Re-enable the workflow from the Actions tab if that happens.
 - A GitHub Pages project site needs `base: '/jejak-harga/'` in `vite.config.js` (matching the repo name), or the deployed page loads blank.
