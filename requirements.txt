@@ -1,2 +1,10 @@
+# Exact versions of everything the data checks install, including pytest's own
+# dependencies, so GitHub Actions installs exactly what was tested here.
+# Change a version on purpose, never by accident.
 duckdb==2.0.1
 pytest==9.0.3
+iniconfig==2.3.1
+packaging==26.3
+pluggy==1.7.0
+Pygments==2.21.0
+colorama==0.4.6; sys_platform == "win32"
